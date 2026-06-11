@@ -1,0 +1,49 @@
+#!/bin/sh
+
+# Wait for MariaDB to be ready
+until nc -z mariadb 3306; do
+    echo "Waiting for MariaDB..."
+    sleep 2
+done
+
+echo "MariaDB is ready!"
+
+# Download WordPress if not already downloaded
+if [ ! -f /var/www/html/wp-config.php ]; then
+    wget -O /tmp/wordpress.tar.gz https://wordpress.org/latest.tar.gz
+    tar -xzf /tmp/wordpress.tar.gz -C /tmp
+    mv /tmp/wordpress/* /var/www/html/
+    rm -rf /tmp/wordpress.tar.gz /tmp/wordpress
+
+    # Download WP-CLI
+    wget -O /usr/local/bin/wp https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    chmod +x /usr/local/bin/wp
+
+    # Create wp-config.php
+    wp config create \
+        --path=/var/www/html \
+        --dbname=${MYSQL_DATABASE} \
+        --dbuser=${MYSQL_USER} \
+        --dbpass=${MYSQL_PASSWORD} \
+        --dbhost=mariadb \
+        --allow-root
+
+    # Install WordPress
+    wp core install \
+        --path=/var/www/html \
+        --url=https://${DOMAIN_NAME} \
+        --title="Inception" \
+        --admin_user=${WP_ADMIN_USER} \
+        --admin_password=${WP_ADMIN_PASSWORD} \
+        --admin_email=${WP_ADMIN_EMAIL} \
+        --allow-root
+
+    # Create second user
+    wp user create ${WP_USER} ${WP_USER_EMAIL} \
+        --role=author \
+        --user_pass=${WP_USER_PASSWORD} \
+        --allow-root
+fi
+
+# Start PHP-FPM
+exec php-fpm83 -F
