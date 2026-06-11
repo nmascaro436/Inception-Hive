@@ -12,7 +12,7 @@ echo "MariaDB is ready!"
 if [ ! -f /var/www/html/wp-config.php ]; then
     wget -O /tmp/wordpress.tar.gz https://wordpress.org/latest.tar.gz
     tar -xzf /tmp/wordpress.tar.gz -C /tmp
-    mv /tmp/wordpress/* /var/www/html/
+    cp -r /tmp/wordpress/* /var/www/html/
     rm -rf /tmp/wordpress.tar.gz /tmp/wordpress
 
     # Download WP-CLI
@@ -40,6 +40,7 @@ if [ ! -f /var/www/html/wp-config.php ]; then
 
     # Create second user
     wp user create ${WP_USER} ${WP_USER_EMAIL} \
+        --path=/var/www/html \
         --role=author \
         --user_pass=${WP_USER_PASSWORD} \
         --allow-root
