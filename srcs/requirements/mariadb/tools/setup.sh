@@ -16,4 +16,6 @@ ALTER USER 'root'@'localhost' IDENTIFIED BY '${MYSQL_ROOT_PASSWORD}';
 FLUSH PRIVILEGES;
 SQL
 
+chmod -R 777 /var/lib/mysql
+
 exec mysqld --user=mysql

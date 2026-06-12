@@ -15,7 +15,7 @@ clean: down
 	docker compose -f $(COMPOSE_FILE) down --rmi all
 
 fclean: clean
-	-doas rm -rf /home/nmascaro/data
+	-rm -rf /home/nmascaro/data
 	docker system prune -af
 
 re: fclean all
