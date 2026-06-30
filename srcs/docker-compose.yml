@@ -1,4 +1,3 @@
-
 services:
   mariadb:
     build: requirements/mariadb
@@ -7,6 +6,9 @@ services:
       - db_data:/var/lib/mysql
     env_file:
       - .env
+    secrets:
+      - db_password
+      - db_root_password
     networks:
       - inception_net
     restart: unless-stopped
@@ -18,6 +20,9 @@ services:
       - wp_data:/var/www/html
     env_file:
       - .env
+    secrets:
+      - db_password
+      - credentials
     networks:
       - inception_net
     restart: unless-stopped
@@ -44,7 +49,6 @@ volumes:
       type: none
       o: bind
       device: /home/nmascaro/data/db
-
   wp_data:
     driver: local
     driver_opts:
@@ -55,3 +59,11 @@ volumes:
 networks:
   inception_net:
     driver: bridge
+
+secrets:
+  db_password:
+    file: ../secrets/db_password.txt
+  db_root_password:
+    file: ../secrets/db_root_password.txt
+  credentials:
+    file: ../secrets/credentials.txt

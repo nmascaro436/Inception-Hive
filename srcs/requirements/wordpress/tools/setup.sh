@@ -1,13 +1,15 @@
 #!/bin/sh
-
 until nc -z mariadb 3306; do
     echo "Waiting for MariaDB..."
     sleep 2
 done
-
 echo "MariaDB is ready!"
 
 if [ ! -f /var/www/html/wp-config.php ]; then
+    MYSQL_PASSWORD=$(cat /run/secrets/db_password)
+    WP_ADMIN_PASSWORD=$(grep WP_ADMIN_PASSWORD /run/secrets/credentials | cut -d '=' -f2)
+    WP_USER_PASSWORD=$(grep WP_USER_PASSWORD /run/secrets/credentials | cut -d '=' -f2)
+
     wget -O /tmp/wordpress.tar.gz https://wordpress.org/latest.tar.gz
     tar -xzf /tmp/wordpress.tar.gz -C /tmp
     cp -r /tmp/wordpress/* /var/www/html/
