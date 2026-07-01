@@ -3,7 +3,7 @@ COMPOSE_FILE = srcs/docker-compose.yml
 all:
 	mkdir -p /home/nmascaro/data/db
 	mkdir -p /home/nmascaro/data/wp
-	chmod -R 777 /home/nmascaro/data
+	if [ ! -d "/home/nmascaro/data/db/mysql" ]; then chmod -R 777 /home/nmascaro/data; fi
 	docker compose -f $(COMPOSE_FILE) up -d --build
 
 up:
